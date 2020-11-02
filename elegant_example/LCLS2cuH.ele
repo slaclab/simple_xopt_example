@@ -1,0 +1,144 @@
+
+! *** OPTICS=AD_ACCEL-01APR20 ***
+
+! Edit "search_path =" in run_setup to point to the locations of your
+! wakefield definition files and input particle distribution files
+
+&run_setup
+ lattice = LCLS2cuH.lte,
+ rootname = LCLS2cuH,
+ use_beamline = myline,
+! output = %s.out,
+ centroid = %s.cen,
+ sigma = %s.sig,
+ final = %s.fin,
+ parameters = %s.par,
+ magnets = %s.mag,
+ combine_bunch_statistics = 0,
+ default_order = 2,
+ concat_order = 0,
+ print_statistics = 0,
+ random_number_seed = 9876543210,
+ p_central_mev = 134.7568,
+! p_central_mev = 135,
+ tracking_updates = 1,
+ print_statistics = 1,
+ search_path = "/global/u2/a/aedelen/GitHub/lcls-lattice/elegant, /global/u2/a/aedelen/GitHub/lcls-lattice/elegant/rmat,/global/u2/a/aedelen/GitHub/lcls-lattice/elegant/wakefields,/global/u2/a/aedelen/GitHub/lcls-lattice/elegant/beams"
+&end
+
+&alter_elements
+name= L1_9_50,
+item = PHASE,
+value=<L1_9_50_phase>
+&end
+
+&alter_elements
+name = L1_9_25,
+item = PHASE,
+value = <L1_9_25_phase>
+&end
+
+&alter_elements
+name = L1_10_25,
+item = PHASE,
+value = <L1_10_25_phase>
+&end
+
+&alter_elements
+name = X1_XBAND,
+item = PHASE,
+value = <X1_Xband_phase>
+&end
+
+&alter_elements
+name = L2_10_50,
+item = PHASE,
+value = <L2_10_50_phase>
+&end
+
+&alter_elements
+name = L2_10_25,
+item = PHASE,
+value = <L2_10_25_phase>
+&end
+
+&alter_elements
+name = L3_10_25,
+item = VOLT,
+value = <L3_10_25_volt>
+&end
+
+&alter_elements
+name = L3_10_50,
+item = VOLT,
+value = <L3_10_50_volt>
+&end
+
+
+&alter_elements
+name = BC1COL,
+item = X_MAX,
+value = <X_MAX>
+&end
+
+
+&alter_elements
+name = BC1COL,
+item = DX,
+value = <DX>
+&end
+
+&alter_elements
+name = HTRMID,
+item = DP,
+value = <DP>
+&end
+
+
+&run_control
+ n_steps = 1,
+ n_indices = 0,
+ reset_rf_for_each_step = 1
+&end
+
+&floor_coordinates !initial coordinates at WS02
+ filename = %s.flr,
+ X0 = 2.370017058026,
+ Z0 = 2.029449371971E3,
+ theta0 = -0.610865238198
+&end
+
+&twiss_output !initial Twiss at WS02
+ filename = %s.twi,
+ matched = 0,
+ beta_x = 1.113007678792,
+ alpha_x = 0.068235445385,
+ beta_y = 1.112536784011,
+ alpha_y = 0.066915836699,
+ concat_order = 3
+&end
+
+&sdds_beam !initial beam at WS02
+!  input = WS02_250pC_rescaleto540um_solGTF1M_flat.out,
+! input = uniform_160pC_matched.sdds,
+!input = uniform_152pC_matched.sdds,
+!input = test_beam_1000.sdds,
+! input_type = "elegant",
+ input = <INPUT_FILE>,
+ sample_interval = <sample_interval>,
+ p_lower = 0
+ p_upper = 1e10,
+ reuse_bunch = 0,
+ reverse_t_sign = 0
+&end
+
+&matrix_output
+    printout = %s.mpr,
+    printout_order = 1,
+    full_matrix_only = 0,
+    output_at_each_step = 1,
+    start_from = BC2CBEG
+&end
+
+
+&track &end

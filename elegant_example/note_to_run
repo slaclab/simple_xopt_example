@@ -1,0 +1,18 @@
+to .bashrc.ext add:
+
+# Elegant
+source /global/u2/c/cmayes/m669/elegant/enable
+
+
+or do:
+
+source /global/u2/c/cmayes/m669/elegant/enable
+
+
+Also need to:
+
+git clone https://github.com/slaclab/lcls-lattice.git
+
+and in .ele file:
+
+ search_path = "/<path>/lcls-lattice/elegant, /<path>/lcls-lattice/elegant/rmat,/<path>/lcls-lattice/elegant/wakefields,/<path>/lcls-lattice/elegant/beams"
