@@ -20,37 +20,12 @@ import os
 import h5py
 from h5py import File
 
+from xopt.tools import fingerprint
+
 ELEGANT_BIN='/global/cfs/cdirs/m669/aliaksei/elegant2020_rhel7/oag/apps/bin/linux-x86_64/elegant'
 HDF5_BIN= '/global/cfs/cdirs/m669/aliaksei/elegant2020_rhel7/epics/extensions/bin/linux-x86_64/sdds2hdf'
 
 H5_SAVE= './output/beams/'
-
-class NpEncoder(json.JSONEncoder):
-    """
-    See: https://stackoverflow.com/questions/50916422/python-typeerror-object-of-type-int64-is-not-json-serializable/50916741
-    """
-    def default(self, obj):
-        if isinstance(obj, np.integer):
-            return int(obj)
-        elif isinstance(obj, np.floating):
-            return float(obj)
-        elif isinstance(obj, np.ndarray):
-            return obj.tolist()
-        else:
-            return super(NpEncoder, self).default(obj)
-
-def fingerprint(keyed_data, digest_size=16):
-    """
-    Creates a cryptographic fingerprint from keyed data. 
-    Used JSON dumps to form strings, and the blake2b algorithm to hash.
-    
-    """
-    h = blake2b(digest_size=16)
-    for key in sorted(keyed_data.keys()):
-        val = keyed_data[key]
-        s = json.dumps(val, sort_keys=True, cls=NpEncoder).encode()
-        h.update(s)
-    return h.hexdigest()
 
 
 def execute_elegant(settings, elename = 'LCLS2cuH.ele', ltename = 'LCLS2cuH.lte', temppath='./output/temporar/'):
