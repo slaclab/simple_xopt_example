@@ -31,10 +31,10 @@ H5_SAVE= './output/beams/'
 def execute_elegant(settings, elename = 'LCLS2cuH.ele', ltename = 'LCLS2cuH.lte', temppath='./output/temporar/'):
 
     
-    #tdir = tempfile.TemporaryDirectory()
-    #path = tdir.name
+    tdir = tempfile.TemporaryDirectory()
+    path = tdir.name
     
-    path = temppath
+    #path = temppath
 
     shutil.copy(elename, path)
     shutil.copy(ltename, path)
