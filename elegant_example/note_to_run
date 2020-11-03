@@ -16,3 +16,9 @@ git clone https://github.com/slaclab/lcls-lattice.git
 and in .ele file:
 
  search_path = "/<path>/lcls-lattice/elegant, /<path>/lcls-lattice/elegant/rmat,/<path>/lcls-lattice/elegant/wakefields,/<path>/lcls-lattice/elegant/beams"
+ 
+ 
+ 
+ Also need to make folders:
+ mkdir output/beams/
+ mkdir output/temporar/
