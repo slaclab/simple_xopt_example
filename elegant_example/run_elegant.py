@@ -25,7 +25,7 @@ from xopt.tools import fingerprint
 
 #ELEGANT_BIN='/global/cfs/cdirs/m669/aliaksei/elegant2020_rhel7/oag/apps/bin/linux-x86_64/elegant'
 #HDF5_BIN= '/global/cfs/cdirs/m669/aliaksei/elegant2020_rhel7/epics/extensions/bin/linux-x86_64/sdds2hdf'
-H5_SAVE= './output/beams/'
+#H5_SAVE= './output/beams/'
 
 #class NpEncoder(json.JSONEncoder):
 #    """
@@ -69,61 +69,30 @@ def execute_elegant(settings, elename = 'LCLS2cuH.ele', ltename = 'LCLS2cuH.lte'
     #    timeout = None
     
     ####-----grab other relevant info for run from settings-----
+    ####-----pop ones that aren't used at the moment too so are not in settings1 -- can fix later
     settings1 = settings.copy()
     elename = settings1.pop('elename')
     ltename = settings1.pop('ltename')
     path_search = settings1.pop('path_search')
     ELEGANT_BIN = settings1.pop('ELEGANT_BIN')
     HDF5_BIN = settings1.pop('HDF5_BIN')
+    H5_SAVE= settings1.pop('HDF5_BIN')
 
     finput_name = settings1.pop('finput_name')
     foutput_name = settings1.pop('foutput_name')
 
-    
+    ####-----temp dir for run-----
     tdir = tempfile.TemporaryDirectory()
     path = tdir.name
 
     shutil.copy('run'+elename, path)
     shutil.copy(ltename, path)
+    
+    ####-----run elegant-----
 
     binname = ELEGANT_BIN
-    cmd = binname + ' ' + 'run' + elename  
+    cmd = binname + ' ' + 'run' + elename 
     
-    ####-----adjust search path according to YAML and rewrite .ele as 'run<elename>'------    
-    
-    f = open(elename,'r')
-    
-    outlines=[]
-    #origlines=[]
-    
-    for line in f.readlines():
-
-        x = line.strip()
-        #origlines.append(line)
-        
-        if x.startswith('search_path'):
-            line = ' search_path = "'+path_search+'"\n'
-            
-        outlines.append(line)
-            
-    
-    f.close()
-    
-    #with open('backup-'+elename, 'w') as f:
-    #    for line in origlines:
-    #        f.write(line)
-            
-    #f.close()
-    
-    with open('run'+elename, 'w') as f:
-        for line in outlines:
-            f.write(line)
-            
-    f.close()
-    
-   
-    ######------run elegant------
-
     for s in settings1:
         cmd += ' -macro=' + s + '=' + str(settings1[s]) + ' '
 
@@ -198,8 +167,47 @@ def merit1(P):
     return d_up
 
 def evaluate_elegant(settings, a=1):
+    
+    
+    ####-----grab other relevant info for run from settings-----
+    settings1 = settings.copy()
+    elename = settings1.pop('elename')
+    ltename = settings1.pop('ltename')
+    path_search = settings1.pop('path_search')
+    HDF5_BIN = settings1.pop('HDF5_BIN')
+    H5_SAVE = settings1.pop('H5_SAVE')
+    
+    ####-----adjust search path according to YAML and rewrite .ele as 'run<elename>'------    
+    
+    f = open(elename,'r')
+    
+    outlines=[]
+    
+    for line in f.readlines():
+
+        x = line.strip()
+        
+        if x.startswith('search_path'):
+            line = ' search_path = "'+path_search+'"\n'
+            
+        outlines.append(line)
+            
+    
+    f.close()
+    
+    with open('run'+elename, 'w') as f:
+        for line in outlines:
+            f.write(line)
+            
+    f.close()
+    
+    
+    ####-----run elegant-----
+    
 
     PF = run_elegant(settings)
+    
+    ####-----save h5 and archive----
     
     fnameh5 = 'elegant_sim_' + fingerprint(settings) + '.h5'
     PF.write(H5_SAVE+fnameh5)
