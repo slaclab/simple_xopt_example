@@ -1,3 +1,6 @@
+
+For NERSC:
+
 #1. to .bashrc.ext add:
 
 # Elegant
@@ -22,6 +25,28 @@ search_path = "/<path>/lcls-lattice/elegant, /<path>/lcls-lattice/elegant/rmat,/
  mkdir output/temporar/
  
  #4. Need input particle distribution elegant_particles.txt (too big for github)
+
+
+
+-------
+
+For other places, need to change some paths:
+
+To change in ele file:
+search_path = "/global/homes/a/aedelen/GitHub/lcls-lattice/elegant, /global/homes/a/aedelen/GitHub/lcls-lattice/elegant/rmat,/global/homes/a/aedelen/GitHub/lcls-lattice/elegant/wakefields,/global/homes/a/aedelen/GitHub/lcls-lattice/elegant/beams"
+
+e.g. for SLAC all go to beamphysics/lcls-lattice/<etcc>
+
+To change in run_elegant.py
+ELEGANT_BIN='/global/cfs/cdirs/m669/aliaksei/elegant2020_rhel7/oag/apps/bin/linux-x86_64/elegant'
+HDF5_BIN= '/global/cfs/cdirs/m669/aliaksei/elegant2020_rhel7/epics/extensions/bin/linux-x86_64/sdds2hdf'
+
+
+e.g. for SLAC '/afs/slac/g/beamphysics/software/Elegant_2016/usr/bin/elegant'
+
+'/afs/slac/g/beamphysics/software/Elegant_2016/use/bin/sdds2hdf'
+
+
 
 
 
