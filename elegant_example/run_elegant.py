@@ -22,29 +22,79 @@ from h5py import File
 
 from xopt.tools import fingerprint
 
-ELEGANT_BIN='/global/cfs/cdirs/m669/aliaksei/elegant2020_rhel7/oag/apps/bin/linux-x86_64/elegant'
-HDF5_BIN= '/global/cfs/cdirs/m669/aliaksei/elegant2020_rhel7/epics/extensions/bin/linux-x86_64/sdds2hdf'
-
+#ELEGANT_BIN='/global/cfs/cdirs/m669/aliaksei/elegant2020_rhel7/oag/apps/bin/linux-x86_64/elegant'
+#HDF5_BIN= '/global/cfs/cdirs/m669/aliaksei/elegant2020_rhel7/epics/extensions/bin/linux-x86_64/sdds2hdf'
 H5_SAVE= './output/beams/'
 
+#class NpEncoder(json.JSONEncoder):
+#    """
+#    See: https://stackoverflow.com/questions/50916422/python-typeerror-object-of-type-int64-is-not-json-serializable/50916741
+#    """
+#    def default(self, obj):
+#        if isinstance(obj, np.integer):
+#            return int(obj)
+#        elif isinstance(obj, np.floating):
+#            return float(obj)
+#        elif isinstance(obj, np.ndarray):
+#            return obj.tolist()
+#        else:
+#            return super(NpEncoder, self).default(obj)
+#
+#def fingerprint(keyed_data, digest_size=16):
+#    """
+#    Creates a cryptographic fingerprint from keyed data. 
+#    Used JSON dumps to form strings, and the blake2b algorithm to hash.
+#    
+#    """
+#    h = blake2b(digest_size=16)
+#    for key in sorted(keyed_data.keys()):
+#        val = keyed_data[key]
+#        s = json.dumps(val, sort_keys=True, cls=NpEncoder).encode()
+#        h.update(s)
+#    return h.hexdigest()
+#
 
-def execute_elegant(settings, elename = 'LCLS2cuH.ele', ltename = 'LCLS2cuH.lte', temppath='./output/temporar/'):
+def execute_elegant(settings, elename = 'LCLS2cuH.ele', ltename = 'LCLS2cuH.lte'):
+
+    #if 'timeout' in settings:
+    #    timeout = settings['timeout']
+    #else:
+    #    timeout = None
+    settings1 = settings.copy()
+    elename = settings1.pop('elename')
+    ltename = settings1.pop('ltename')
+    path_search = settings1.pop('path_search')
+    ELEGANT_BIN = settings1.pop('ELEGANT_BIN')
+    HDF5_BIN = settings1.pop('HDF5_BIN')
+
+    finput_name = settings1.pop('finput_name')
+    foutput_name = settings1.pop('foutput_name')
 
     
     tdir = tempfile.TemporaryDirectory()
     path = tdir.name
     
-    #path = temppath
+    #path = tdir
 
     shutil.copy(elename, path)
     shutil.copy(ltename, path)
 
     binname = ELEGANT_BIN
-    elename = elename
     cmd = binname + ' ' + elename
+    
+    #f = open(elename,'r')
+    #filedata = f.read()
+    #f.close()
 
-    for s in settings:
-        cmd += ' -macro=' + s + '=' + str(settings[s]) + ' '
+    #newdata = filedata.replace('path_search',path_search)
+
+    #f = open(elename,'w')
+    #f.write(newdata)
+    #f.close()
+
+
+    for s in settings1:
+        cmd += ' -macro=' + s + '=' + str(settings1[s]) + ' '
 
     print (cmd)
     cmd_run = cmd.split()
@@ -52,13 +102,13 @@ def execute_elegant(settings, elename = 'LCLS2cuH.ele', ltename = 'LCLS2cuH.lte'
 
 
     p = subprocess.run(cmd_run, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=path)
-    PF = process_output(path)
+    PF = process_output(path,HDF5_BIN,finput_name,foutput_name)
     output['log'] = p.stdout
     output['error'] = False
 
     return PF
 
-def process_output(path, finput_name='HXRSTART.out', foutput_name='HXRSTART.h5'):
+def process_output(path, HDF5_BIN, finput_name='HXRSTART.out', foutput_name='HXRSTART.h5',timeout=None):
 
     finput = os.path.join(path,finput_name)
     foutput = os.path.join(path,foutput_name)
@@ -70,7 +120,6 @@ def process_output(path, finput_name='HXRSTART.out', foutput_name='HXRSTART.h5')
     #print(cmd)
     cmd_run = cmd.split()
     output = {'error':True, 'log':''}
-
 
     p = subprocess.run(cmd_run, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     data = elegant_h5_to_data(foutput)
@@ -133,7 +182,7 @@ def evaluate_elegant(settings, a=1):
 def main(PATH=''):
 
     settings = {'L1_9_50_phase':50.5, 'L1_9_25_phase':50.5, 'L1_10_25_phase':50.5, 'X1_Xband_phase':-70, 
-                'L2_10_50_phase':55.5, 'L2_10_25_phase':55.5, 'L3_10_25_volt':1.6628471874e7, 'X_MAX':1.3e-3,              
+                'L2_10_50_phase':55.5, 'L2_10_25_phase':55.5, 'L3_10_25_volt':1.6628471874e7, 'X_MAX':1.3e-3,             
                 'DX':0.9e-3, 'DP': 15.0e-5,
                 'INPUT_FILE':PATH+'elegant_particles.txt'}
     
