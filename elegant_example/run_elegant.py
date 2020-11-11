@@ -19,6 +19,7 @@ import shutil
 import os
 import h5py
 from h5py import File
+import re
 
 from xopt.tools import fingerprint
 
@@ -54,6 +55,12 @@ H5_SAVE= './output/beams/'
 #    return h.hexdigest()
 #
 
+def replaceTextBetween(originalText, delimeterA, delimterB, replacementText):
+    leadingText = originalText.split(delimeterA)[0]
+    trailingText = originalText.split(delimterB)[1]
+
+    return leadingText + delimeterA + replacementText + delimterB + trailingText
+
 def execute_elegant(settings, elename = 'LCLS2cuH.ele', ltename = 'LCLS2cuH.lte'):
 
     #if 'timeout' in settings:
@@ -82,12 +89,31 @@ def execute_elegant(settings, elename = 'LCLS2cuH.ele', ltename = 'LCLS2cuH.lte'
     binname = ELEGANT_BIN
     cmd = binname + ' ' + elename
     
-    #f = open(elename,'r')
-    #filedata = f.read()
-    #f.close()
+    f = open(elename,'r')
+    
+    outlines=[]
+    
+    for line in f.readlines():
 
+        line = line.strip()
+
+        if line.startswith('search_path'):
+            line = path_search
+            
+        else:
+
+            outlines.append(line)
+            
+    f.close()
+
+    with open(elename, 'w') as f:
+        for line in outlines:
+            f.write(line)
+    
+ 
+    f.close()
+   
     #newdata = filedata.replace('path_search',path_search)
-
     #f = open(elename,'w')
     #f.write(newdata)
     #f.close()
