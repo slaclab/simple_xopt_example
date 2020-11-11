@@ -67,6 +67,8 @@ def execute_elegant(settings, elename = 'LCLS2cuH.ele', ltename = 'LCLS2cuH.lte'
     #    timeout = settings['timeout']
     #else:
     #    timeout = None
+    
+    ####-----grab other relevant info for run from settings-----
     settings1 = settings.copy()
     elename = settings1.pop('elename')
     ltename = settings1.pop('ltename')
@@ -80,44 +82,47 @@ def execute_elegant(settings, elename = 'LCLS2cuH.ele', ltename = 'LCLS2cuH.lte'
     
     tdir = tempfile.TemporaryDirectory()
     path = tdir.name
-    
-    #path = tdir
 
-    shutil.copy(elename, path)
+    shutil.copy('run'+elename, path)
     shutil.copy(ltename, path)
 
     binname = ELEGANT_BIN
-    cmd = binname + ' ' + elename
+    cmd = binname + ' ' + 'run' + elename  
+    
+    ####-----adjust search path according to YAML and rewrite .ele as 'run<elename>'------    
     
     f = open(elename,'r')
     
     outlines=[]
+    #origlines=[]
     
     for line in f.readlines():
 
-        line = line.strip()
-
-        if line.startswith('search_path'):
-            line = path_search
+        x = line.strip()
+        #origlines.append(line)
+        
+        if x.startswith('search_path'):
+            line = ' search_path = "'+path_search+'"\n'
             
-        else:
-
-            outlines.append(line)
+        outlines.append(line)
             
+    
     f.close()
-
-    with open(elename, 'w') as f:
+    
+    #with open('backup-'+elename, 'w') as f:
+    #    for line in origlines:
+    #        f.write(line)
+            
+    #f.close()
+    
+    with open('run'+elename, 'w') as f:
         for line in outlines:
             f.write(line)
-    
- 
+            
     f.close()
+    
    
-    #newdata = filedata.replace('path_search',path_search)
-    #f = open(elename,'w')
-    #f.write(newdata)
-    #f.close()
-
+    ######------run elegant------
 
     for s in settings1:
         cmd += ' -macro=' + s + '=' + str(settings1[s]) + ' '
