@@ -32,17 +32,37 @@ def execute_elegant(settings, ele_fname = None, lte_fname = None):
     path_search = settings1.pop('path_search')
     ELEGANT_BIN = settings1.pop('ELEGANT_BIN')
     HDF5_BIN = settings1.pop('HDF5_BIN')
-    H5_SAVE = settings1.pop('H5_SAVE')
 
     finput_name = settings1.pop('finput_name')
     foutput_name = settings1.pop('foutput_name')
+    
 
     ####---------#### temp dir for run
     tdir = tempfile.TemporaryDirectory()
     path = tdir.name
 
-    shutil.copy('run'+ele_fname, path)
+    shutil.copy(ele_fname, path)
     shutil.copy(lte_fname, path)
+    
+    ####---------#### adjust search path according to YAML and rewrite .ele as 'run<ele_fname>' 
+    
+    with open(path+'/'+ele_fname,'r') as f:
+    
+        outlines=[]
+
+        for line in f.readlines():
+
+            x = line.strip()
+
+            if x.startswith('search_path'):
+                line = ' search_path = "'+path_search+'"\n'
+
+            outlines.append(line)
+            
+    
+    with open(path+'/run'+ele_fname, 'w') as f:
+        for line in outlines:
+            f.write(line)
     
     ####---------#### run elegant
 
@@ -115,34 +135,7 @@ def merit1(P):
 
 def evaluate_elegant(settings, a=1):
     
-    ####---------#### grab other relevant info for run from settings
-    settings1 = settings.copy()
-    ele_fname = settings1.pop('ele_fname')
-    lte_fname = settings1.pop('lte_fname')
-    path_search = settings1.pop('path_search')
-    HDF5_BIN = settings1.pop('HDF5_BIN')
-    H5_SAVE = settings1.pop('H5_SAVE')
-    
-    ####---------#### adjust search path according to YAML and rewrite .ele as 'run<ele_fname>' 
-    
-    with open(ele_fname,'r') as f:
-    
-        outlines=[]
-
-        for line in f.readlines():
-
-            x = line.strip()
-
-            if x.startswith('search_path'):
-                line = ' search_path = "'+path_search+'"\n'
-
-            outlines.append(line)
-            
-    
-    with open('run'+ele_fname, 'w') as f:
-        for line in outlines:
-            f.write(line)
-            
+    H5_SAVE = settings.pop('H5_SAVE')
     
     ####---------#### run elegant
     
