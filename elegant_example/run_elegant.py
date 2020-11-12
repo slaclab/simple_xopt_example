@@ -64,7 +64,7 @@ def execute_elegant(settings, ele_fname = None, lte_fname = None):
 
     return PF
 
-def process_output(path, HDF5_BIN, finput_name='HXRSTART.out', foutput_name='HXRSTART.h5',timeout=None):
+def process_output(path, HDF5_BIN, finput_name = None, foutput_name = None,timeout=None):
 
     finput = os.path.join(path,finput_name)
     foutput = os.path.join(path,foutput_name)
