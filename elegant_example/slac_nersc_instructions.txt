@@ -8,7 +8,6 @@ source /global/u2/c/cmayes/m669/elegant/enable
 
 
 #or do:
-
 source /global/u2/c/cmayes/m669/elegant/enable
 
 
